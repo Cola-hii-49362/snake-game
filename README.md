@@ -1,155 +1,158 @@
-# 🐍 贪吃蛇 · Snake
+# 🐍 Snake
 
-> 一个**单文件、零依赖**的 HTML5 贪吃蛇小游戏。没有构建步骤，没有 npm 包，双击 `index.html` 就能玩。
+> A **single-file, zero-dependency** HTML5 Snake game. No build step, no npm packages — just double-click `index.html` and play.
 
 <p>
-  <a href="https://cola-hii-49362.github.io/snake-game/"><b>🎮 在线试玩</b></a>
+  <a href="https://cola-hii-49362.github.io/snake-game/"><b>🎮 Play online</b></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/Cola-hii-49362/snake-game">📦 源码仓库</a>
+  <a href="https://github.com/Cola-hii-49362/snake-game">📦 Source</a>
 </p>
 
-![游戏预览](docs/preview.png)
+![Gameplay preview](docs/preview.png)
+
+> ℹ️ The in-game UI text is in Chinese. See [Changing the UI language](#changing-the-ui-language) if you'd like to translate it.
 
 ---
 
-## 目录
+## Table of contents
 
-- [这是什么](#这是什么)
-- [快速开始](#快速开始)
-- [操作方式](#操作方式)
-- [游戏规则](#游戏规则)
-- [难度设定](#难度设定)
-- [功能特性](#功能特性)
-- [技术实现](#技术实现)
-- [项目结构](#项目结构)
-- [自定义指南](#自定义指南)
-- [部署与更新](#部署与更新)
-- [浏览器兼容性](#浏览器兼容性)
-
----
-
-## 这是什么
-
-一个用原生 HTML5 Canvas 写的贪吃蛇。整个游戏——页面结构、样式、逻辑、音效——全部塞在**一个 `index.html` 文件**里，大约 900 行。
-
-做它的时候有几个明确的目标：
-
-- **打开就能玩**：不需要装环境、不需要编译、不需要联网（音效是实时合成的，没有外部音频文件）
-- **手感要顺**：蛇是平滑游动的，不是一格一格地跳
-- **手机上也能玩**：支持触屏滑动和屏幕方向键
+- [What is this](#what-is-this)
+- [Quick start](#quick-start)
+- [Controls](#controls)
+- [How to play](#how-to-play)
+- [Difficulty](#difficulty)
+- [Features](#features)
+- [Under the hood](#under-the-hood)
+- [Project structure](#project-structure)
+- [Customization guide](#customization-guide)
+- [Deployment & updates](#deployment--updates)
+- [Browser support](#browser-support)
+- [License](#license)
 
 ---
 
-## 快速开始
+## What is this
 
-### 方式一：直接在线玩（最省事）
+A Snake game written in vanilla HTML5 Canvas. The entire thing — markup, styles, game logic, and sound — lives in **one `index.html` file** of roughly 900 lines.
 
-打开 <https://cola-hii-49362.github.io/snake-game/>
+It was built around three goals:
 
-### 方式二：本地打开
+- **Open it and play.** No environment to install, no compilation, no network access required (the sound effects are synthesized at runtime, so there are no audio files).
+- **It has to feel good.** The snake glides smoothly instead of hopping cell by cell.
+- **It works on phones.** Touch swipes and an on-screen D-pad are supported.
 
-把 `index.html` 下载下来，双击即可。或者在浏览器里按 `Cmd/Ctrl + O` 选中它。
+---
 
-### 方式三：起个本地服务器（可选）
+## Quick start
 
-如果你要改代码、想边改边看，建议起个服务器避免缓存干扰：
+### Option 1: Play online (easiest)
+
+Open <https://cola-hii-49362.github.io/snake-game/>
+
+### Option 2: Run it locally
+
+Download `index.html` and double-click it. Or press `Cmd/Ctrl + O` in your browser and select the file.
+
+### Option 3: Serve it locally (optional)
+
+If you're editing the code and want to avoid browser caching, spin up a local server:
 
 ```bash
-cd 贪吃蛇小游戏
+cd snake-game
 python3 -m http.server 8000
-# 然后访问 http://localhost:8000
+# then visit http://localhost:8000
 ```
 
 ---
 
-## 操作方式
+## Controls
 
-| 操作 | 键盘 | 触屏 / 手机 |
+| Action | Keyboard | Touch / mobile |
 | --- | --- | --- |
-| 上下左右 | `↑` `↓` `←` `→` 或 `W` `A` `S` `D` | 在棋盘上滑动，或点屏幕下方的方向键 |
-| 暂停 / 继续 | `空格` | 点「暂停」按钮 |
-| 重新开始 | `R` 或 `Enter` | 点「重开」按钮 |
-| 开关音效 | 点工具栏「音效」按钮 | 同左 |
+| Move | `↑` `↓` `←` `→` or `W` `A` `S` `D` | Swipe on the board, or tap the D-pad below it |
+| Pause / resume | `Space` | Tap the pause button |
+| Restart | `R` or `Enter` | Tap the restart button |
+| Toggle sound | Click the sound button in the toolbar | Same |
 
-几个手感上的细节：
+A few details that matter for how it feels:
 
-- **方向输入有缓冲**。快速连按拐弯不会丢操作（最多缓存两步），但也不会让你因为手抖而误转向。
-- **禁止 180° 掉头**。正在向右走时按左键无效，不会直接撞死自己。
-- **切到别的标签页会自动暂停**，回来不会发现已经撞墙了。
-
----
-
-## 游戏规则
-
-1. 蛇会一直向前走，吃掉**红色果实**即可得分。
-2. 每吃一个果实，蛇身**变长 1 格**，得分 **+1**。
-3. **吃到越多，速度越快**：每得 5 分提升一档速度（有下限，不会快到没法操作）。
-4. 游戏结束的条件：
-   - 蛇头**撞到墙壁**
-   - 蛇头**撞到自己的身体**
-5. 最高分会自动保存在浏览器本地（`localStorage`），关掉页面再打开依然在。破纪录时会弹出「新纪录！」提示。
-
-> 💡 小技巧：贴着墙走能留出更大的活动空间；长蛇阶段尽量「画圈」而不是来回折返，避免把自己困死。
+- **Input is buffered.** Quick consecutive turns aren't dropped (up to two moves are queued), but the buffer is short enough that a stray keypress won't send you somewhere you didn't intend.
+- **No 180° reversals.** Pressing left while moving right does nothing — you can't instantly kill yourself.
+- **Switching tabs auto-pauses**, so you won't come back to find you've crashed into a wall.
 
 ---
 
-## 难度设定
+## How to play
 
-开始界面可以选择三档难度，区别只在**速度参数**上：
+1. The snake moves forward continuously. Eat the **red fruit** to score.
+2. Each fruit **grows the snake by one segment** and awards **+1 point**.
+3. **The more you eat, the faster it gets** — every 5 points bumps the speed up one level (with a floor, so it never becomes unplayable).
+4. The game ends when:
+   - the snake's head **hits a wall**, or
+   - the snake's head **hits its own body**.
+5. Your best score is saved locally in the browser (`localStorage`), so it survives closing the page. Beating it triggers a "New record!" badge.
 
-| 难度 | 初始速度 | 最快速度 | 提速幅度 |
+> 💡 Tip: hugging the walls leaves you more open space. Once the snake is long, try to circle rather than zig-zag back and forth, or you'll trap yourself.
+
+---
+
+## Difficulty
+
+Three difficulty levels are available on the start screen. They differ only in **speed parameters**:
+
+| Difficulty | Starting speed | Top speed | Speed-up per level |
 | --- | --- | --- | --- |
-| 轻松 | 175 ms / 步 | 95 ms / 步 | 每档 −4 ms |
-| 普通 | 140 ms / 步 | 70 ms / 步 | 每档 −5 ms |
-| 挑战 | 105 ms / 步 | 55 ms / 步 | 每档 −4 ms |
+| Easy | 175 ms / step | 95 ms / step | −4 ms |
+| Normal | 140 ms / step | 70 ms / step | −5 ms |
+| Hard | 105 ms / step | 55 ms / step | −4 ms |
 
-（数值越小 = 蛇走得越快。每 5 分提升一档。）
-
----
-
-## 功能特性
-
-- ✅ 单文件、零依赖、可离线运行
-- ✅ 平滑插值渲染，蛇身连贯流畅
-- ✅ 键盘 + 触屏滑动 + 屏幕方向键，三套操作方式
-- ✅ 三档难度，自动提速
-- ✅ 最高分本地持久化
-- ✅ WebAudio 实时合成音效，可一键静音
-- ✅ 暂停 / 重开 / 后台自动暂停
-- ✅ 响应式布局，适配手机竖屏和桌面宽屏
-- ✅ 高分屏适配（devicePixelRatio）
+(Smaller numbers mean the snake moves faster. One level is gained every 5 points.)
 
 ---
 
-## 技术实现
+## Features
 
-### 整体架构
+- ✅ Single file, zero dependencies, works offline
+- ✅ Interpolated rendering for smooth, fluid snake movement
+- ✅ Three control schemes: keyboard, touch swipe, on-screen D-pad
+- ✅ Three difficulty levels with automatic speed-up
+- ✅ Best score persisted locally
+- ✅ Sound effects synthesized with WebAudio, mutable with one click
+- ✅ Pause / restart / auto-pause when the tab loses focus
+- ✅ Responsive layout that fits phone portrait and desktop widescreen
+- ✅ HiDPI-aware rendering (`devicePixelRatio`)
 
-代码分三层，都写在 `index.html` 底部的 `<script>` 里：
+---
 
-| 层 | 职责 | 主要函数 |
+## Under the hood
+
+### Architecture
+
+The code is split into three layers, all inside the `<script>` block at the bottom of `index.html`:
+
+| Layer | Responsibility | Key functions |
 | --- | --- | --- |
-| 状态层 | 保存游戏数据 | `game` 对象 |
-| 逻辑层 | 按固定步长推进游戏 | `step()` / `spawnFood()` / `gameOver()` |
-| 渲染层 | 每帧绘制画面 | `draw()` / `drawSnake()` / `drawFood()` |
+| State | Holds the game data | the `game` object |
+| Logic | Advances the game on a fixed timestep | `step()` / `spawnFood()` / `gameOver()` |
+| Rendering | Draws the frame | `draw()` / `drawSnake()` / `drawFood()` |
 
-### 几个关键点
+### Implementation notes
 
-**1. 固定步长 + 插值渲染**
+**1. Fixed timestep + interpolated rendering**
 
-游戏逻辑不能跟着屏幕刷新率走（60Hz 和 120Hz 显示器会跑出不同速度），所以用了「累加器」模式：逻辑按固定的 `stepMs` 推进，渲染时用剩余时间算出一个 `alpha`（0~1），把蛇的位置在上一步和这一步之间做插值。
+Game logic can't be tied to the display refresh rate, or a 60 Hz and a 120 Hz monitor would produce different snake speeds. So it uses an accumulator: logic advances on a fixed `stepMs`, while rendering derives an `alpha` (0–1) from the leftover time and interpolates each segment's position between the previous step and the current one.
 
 ```js
 game.acc += dt;
 while (game.acc >= game.stepMs) { game.acc -= game.stepMs; step(); }
-game.alpha = game.acc / game.stepMs;   // 交给渲染层做平滑
+game.alpha = game.acc / game.stepMs;   // handed to the renderer for smoothing
 ```
 
-这就是「蛇在平滑游动」而不是「一格格跳」的原因。
+This is why the snake glides rather than hopping between cells.
 
-**2. 蛇身的平滑绘制**
+**2. Smooth snake body**
 
-没有一个个画方块，而是把每一节的插值坐标连成一条路径，用**二次贝塞尔曲线**平滑折角，再用圆角线帽描边：
+Rather than drawing a square per segment, the interpolated coordinates are joined into a single path, corners are smoothed with **quadratic Bézier curves**, and the path is stroked with rounded caps:
 
 ```js
 ctx.lineCap = "round";
@@ -157,66 +160,68 @@ ctx.lineJoin = "round";
 ctx.lineWidth = cell * 0.74;
 ```
 
-外面再叠一层 `shadowBlur` 做辉光、叠一层半透明白线做高光，蛇就有了圆润的立体感。头部单独画圆，并沿当前方向画出两只眼睛。
+A `shadowBlur` pass adds the outer glow, and a translucent white stroke adds a highlight — which gives the body a rounded, three-dimensional look. The head is drawn as its own circle with two eyes oriented along the current direction.
 
-**3. 方向输入队列**
+**3. Direction input queue**
 
-方向键不能直接改 `dir`，否则一帧内连按两次会绕过掉头检查。所以输入先进队列，每步只取一个：
+Direction keys must not write to `dir` directly; otherwise two presses within a single frame could bypass the reversal check. Inputs go into a queue and exactly one is consumed per step:
 
 ```js
-if (name === last) return;              // 同方向忽略
-if (name === OPPOSITE[last]) return;    // 禁止 180° 掉头
-if (game.queue.length >= 2) return;     // 最多缓存两步
+if (name === last) return;              // same direction, ignore
+if (name === OPPOSITE[last]) return;    // no 180° reversal
+if (game.queue.length >= 2) return;     // buffer at most two moves
 ```
 
-**4. 碰撞检测的边界情况**
+**4. The tricky edge case in collision detection**
 
-判断「撞到自己」时有个容易写错的地方：**如果这一步不吃食物，尾巴会同时移开**，所以撞到当前尾格是合法的，不算死。
+When checking whether the snake hit itself, there's an easy mistake to make: **if the snake isn't eating this step, the tail vacates its cell at the same time**, so moving into the current tail cell is legal.
 
 ```js
 const limit = willEat ? game.snake.length : game.snake.length - 1;
 ```
 
-**5. 音效**
+**5. Sound**
 
-没有音频文件，全部用 WebAudio 的 `OscillatorNode` 现场合成——吃果实是两声上行短音，游戏结束是三声下行音。
+There are no audio files. Everything is synthesized live with WebAudio `OscillatorNode`s — eating is two rising blips, and game over is three descending tones.
 
-**6. 持久化**
+**6. Persistence**
 
-| 数据 | 存储键 |
+| Data | Storage key |
 | --- | --- |
-| 最高分 | `snake_best_v1` |
-| 音效开关 | `snake_sound_v1` |
+| Best score | `snake_best_v1` |
+| Sound on/off | `snake_sound_v1` |
 
 ---
 
-## 项目结构
+## Project structure
 
 ```
-贪吃蛇小游戏/
-├── index.html      # 游戏本体（结构 + 样式 + 逻辑，全在这一个文件）
-├── .gitignore      # 忽略系统文件、编辑器配置、AI 助手本地目录
-└── README.md       # 你正在看的这份文档
+snake-game/
+├── index.html      # The whole game (markup + styles + logic in one file)
+├── docs/
+│   └── preview.png # Screenshot used in this README
+├── .gitignore      # Ignores OS files, editor config, local AI assistant data
+└── README.md       # The document you're reading
 ```
 
-> 是的，就这些。没有 `node_modules`，没有构建产物。
+> That's it. No `node_modules`, no build artifacts.
 
 ---
 
-## 自定义指南
+## Customization guide
 
-想改点什么？下面是最常改的几处，都在 `index.html` 里。
+Want to change something? Here are the most common tweaks, all inside `index.html`.
 
-### 改棋盘大小
+### Board size
 
 ```js
 const COLS = 20;
 const ROWS = 20;
 ```
 
-⚠️ 注意：棋盘容器用 CSS `aspect-ratio: 1/1` 固定成了正方形。如果你把 `COLS` 和 `ROWS` 改成不相等，画面会被拉伸。想支持长方形棋盘，需要同时改 `.stage` 的 `aspect-ratio`。
+⚠️ Note: the board container is locked to a square by the CSS `aspect-ratio: 1/1`. If you make `COLS` and `ROWS` unequal, the rendering will stretch. To support a rectangular board, update the `aspect-ratio` on `.stage` as well.
 
-### 改速度 / 难度
+### Speed and difficulty
 
 ```js
 const DIFFICULTIES = {
@@ -226,29 +231,29 @@ const DIFFICULTIES = {
 };
 ```
 
-- `base` 初始每步毫秒数（越小越快）
-- `min` 速度上限（最快能到多少毫秒一步）
-- `step` 每提升一档减少的毫秒数
+- `base` — starting milliseconds per step (smaller is faster)
+- `min` — speed ceiling (the fastest milliseconds per step)
+- `step` — milliseconds removed per level gained
 
-想改「多少分提一档」，找 `updateSpeed()` 里的 `Math.floor(game.score / 5)`，把 `5` 改掉即可。
+To change how many points make a level, look at `Math.floor(game.score / 5)` inside `updateSpeed()` and change the `5`.
 
-### 改配色
+### Colors
 
-主色板在 CSS 顶部的 `:root` 里：
+The main palette lives in the `:root` block at the top of the CSS:
 
 ```css
 :root{
-  --brand: #10b981;   /* 主色（绿色） */
-  --accent: #ef4444;  /* 果实红 */
-  --board: #0f172a;   /* 棋盘底色 */
+  --brand: #10b981;   /* primary green */
+  --accent: #ef4444;  /* fruit red */
+  --board: #0f172a;   /* board background */
 }
 ```
 
-蛇身和果实的渐变在 JS 里：蛇身搜 `#5eead4` / `#34d399` / `#0d9488`，果实搜 `#fca5a5` / `#ef4444` / `#b91c1c`。
+The snake and fruit gradients are in the JS: search for `#5eead4` / `#34d399` / `#0d9488` for the snake, and `#fca5a5` / `#ef4444` / `#b91c1c` for the fruit.
 
-### 改初始长度
+### Starting length
 
-在 `resetGame()` 里：
+In `resetGame()`:
 
 ```js
 game.snake = [
@@ -258,42 +263,50 @@ game.snake = [
 ];
 ```
 
-多加几行就是更长的初始蛇。
+Add more entries for a longer starting snake.
+
+### Changing the UI language
+
+All user-facing strings are plain text in the HTML body — no i18n layer. To translate the interface:
+
+1. **Static text** — edit it directly in the markup. This covers the title, the three scoreboard labels (`当前得分` / `最高分` / `长度`), the toolbar buttons (`暂停` / `重开` / `音效`), the hint line, and the overlay copy for start / pause / game over.
+2. **Difficulty labels** — the buttons carry `data-diff="easy|normal|hard"`, while their visible names come from two places: the button text in the HTML, and the `label` field in the `DIFFICULTIES` object (which feeds the badge next to the title). Update both.
+3. **Dynamic strings** — a couple of labels are set from JS: the sound button renders `音效` / `静音` in `renderSoundBtn()`, and the "New record!" badge is the `#badgeNew` element.
 
 ---
 
-## 部署与更新
+## Deployment & updates
 
-仓库已经开启 **GitHub Pages**，`main` 分支的根目录会自动部署。
+This repo has **GitHub Pages** enabled; the root of the `main` branch deploys automatically.
 
-线上地址：<https://cola-hii-49362.github.io/snake-game/>
+Live URL: <https://cola-hii-49362.github.io/snake-game/>
 
-更新流程就两条命令，推上去后大约 30 秒自动重新部署：
+Updating is two commands, and Pages redeploys about 30 seconds later:
 
 ```bash
 git add -A
-git commit -m "你的改动说明"
+git commit -m "your message"
 git push
 ```
 
-> 如果更新后看到的是旧版本，用 `Cmd/Ctrl + Shift + R` 强制刷新一下，Pages 有缓存。
+> If you still see the old version after pushing, hard-refresh with `Cmd/Ctrl + Shift + R` — Pages caches aggressively.
 
 ---
 
-## 浏览器兼容性
+## Browser support
 
-需要支持 Canvas 2D、`localStorage` 和 `requestAnimationFrame` 的现代浏览器：
+Requires a modern browser with Canvas 2D, `localStorage`, and `requestAnimationFrame`:
 
-| 浏览器 | 支持情况 |
+| Browser | Status |
 | --- | --- |
 | Chrome / Edge | ✅ |
-| Safari（含 iOS） | ✅ |
+| Safari (incl. iOS) | ✅ |
 | Firefox | ✅ |
 
-音效依赖 WebAudio，极少数老浏览器不支持时会**静默跳过**，不影响游戏本身。
+Sound depends on WebAudio. In the rare browser that lacks it, audio is **skipped silently** and gameplay is unaffected.
 
 ---
 
-## 许可
+## License
 
-暂未添加开源许可证。如果你想正式开源，建议补一个（比如 MIT），我可以帮你加上。
+No license has been added yet. If you intend to open-source this properly, consider adding one (MIT, for example).
