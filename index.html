@@ -1040,16 +1040,16 @@
 
     // 蛇身渐变（头 → 尾）
     const grad = ctx.createLinearGradient(head.x, head.y, tail.x, tail.y);
-    grad.addColorStop(0, "#f87171");
-    grad.addColorStop(0.35, "#dc2626");
-    grad.addColorStop(1, "#7f1d1d");
+    grad.addColorStop(0, "#60a5fa");
+    grad.addColorStop(0.35, "#2563eb");
+    grad.addColorStop(1, "#1e3a8a");
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
     // 外发光
     ctx.save();
-    ctx.shadowColor = "rgba(220,38,38,.55)";
+    ctx.shadowColor = "rgba(37,99,235,.55)";
     ctx.shadowBlur = cell * 0.75;
     ctx.strokeStyle = grad;
     ctx.lineWidth = cell * 0.74;
@@ -1068,7 +1068,7 @@
 
     // 蛇头
     const d = DIRS[game.dir];
-    ctx.fillStyle = "#f87171";
+    ctx.fillStyle = "#60a5fa";
     ctx.beginPath();
     ctx.arc(head.x, head.y, cell * 0.40, 0, Math.PI * 2);
     ctx.fill();
@@ -1126,7 +1126,7 @@
     // 吃到食物时的一圈扩散光
     if (game.eatFlash > 0) {
       const h = segCenter(0, game.alpha);
-      ctx.strokeStyle = "rgba(248,113,113," + (game.eatFlash * 0.5) + ")";
+      ctx.strokeStyle = "rgba(96,165,250," + (game.eatFlash * 0.5) + ")";
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(h.x, h.y, cell * (0.6 + (1 - game.eatFlash) * 1.6), 0, Math.PI * 2);
