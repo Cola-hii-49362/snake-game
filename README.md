@@ -34,7 +34,7 @@
 
 ## What is this
 
-A Snake game written in vanilla HTML5 Canvas. The entire thing — markup, styles, game logic, and sound — lives in **one `index.html` file** of roughly 900 lines.
+A Snake game written in vanilla HTML5 Canvas. The entire thing — markup, styles, game logic, and sound — lives in **one `index.html` file** of roughly 1,300 lines.
 
 It was built around three goals:
 
@@ -62,6 +62,7 @@ Design notes:
 - **Lasers never spawn within 3 cells of the snake's head**, so there is always room to react during the warning phase.
 - **Obstacles and portals never overlap**, and food never spawns on either. The area around the starting snake is kept clear.
 - Portals teleport the head only; the renderer splits the body at that moment so the snake doesn't draw a line across the whole board.
+- **Exiting onto your own body is allowed.** Portals are placed on empty cells, but the snake's body can drift over an exit later. Landing on yourself this way does **not** kill you — the snake briefly overlaps and untangles as it moves on. Treating it as a self-collision would punish the player for something they cannot control.
 
 All the tuning values live in one place:
 
@@ -127,6 +128,8 @@ A few details that matter for how it feels:
    - the snake's head **hits a wall**, or
    - the snake's head **hits its own body**.
 5. Your best score is saved locally in the browser (`localStorage`), so it survives closing the page. Beating it triggers a "New record!" badge.
+
+> 🧨 **On this branch there are extra ways to die** — obstacles and lasers. See [Mini-game branch](#mini-game-branch) for the full rules.
 
 > 💡 Tip: hugging the walls leaves you more open space. Once the snake is long, try to circle rather than zig-zag back and forth, or you'll trap yourself.
 
