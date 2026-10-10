@@ -17,6 +17,7 @@
 ## Table of contents
 
 - [What is this](#what-is-this)
+- [Mini-game branch](#mini-game-branch)
 - [Quick start](#quick-start)
 - [Controls](#controls)
 - [How to play](#how-to-play)
@@ -40,6 +41,41 @@ It was built around three goals:
 - **Open it and play.** No environment to install, no compilation, no network access required (the sound effects are synthesized at runtime, so there are no audio files).
 - **It has to feel good.** The snake glides smoothly instead of hopping cell by cell.
 - **It works on phones.** Touch swipes and an on-screen D-pad are supported.
+
+---
+
+## Mini-game branch
+
+This branch — `feature/minigames` — layers three extra hazards on top of the classic game. `main` stays classic; this is the "chaos mode" experiment.
+
+![Mini-game preview](docs/preview-minigames.png)
+
+| Element | Behaviour |
+| --- | --- |
+| 🧱 **Obstacles** | Static blocks scattered across the board. Hitting one ends the game. The count scales with difficulty: 6 / 8 / 10. |
+| 🌀 **Portals** | A linked pair (purple ↔ cyan). Enter one and the snake comes out of the other, keeping its direction. They **activate once the snake reaches 8 segments**, announced with a toast. |
+| 🔴 **Laser** | A full-width beam that telegraphs itself with a dashed line and edge emitters for **1.4 s**, then fires for **0.52 s**. If the snake's **head** is on the beam line while it fires, the game ends. Lasers start appearing after you score **8 points**, one at a time, with a 1.6 s gap between them. |
+
+Design notes:
+
+- **Only the head is checked against the laser.** The beam passes harmlessly through the body — otherwise a long snake could be killed by a beam it has no way to clear in time.
+- **Lasers never spawn within 3 cells of the snake's head**, so there is always room to react during the warning phase.
+- **Obstacles and portals never overlap**, and food never spawns on either. The area around the starting snake is kept clear.
+- Portals teleport the head only; the renderer splits the body at that moment so the snake doesn't draw a line across the whole board.
+
+All the tuning values live in one place:
+
+```js
+const FEATURES = {
+  obstacles:      { easy: 6, normal: 8, hard: 10 },
+  portalAtLength: 8,
+  laserFromScore: 8,
+  laserWarnMs:    1400,
+  laserFireMs:    520,
+  laserGapMs:     1600,
+  laserSafeDist:  3
+};
+```
 
 ---
 
@@ -199,7 +235,8 @@ There are no audio files. Everything is synthesized live with WebAudio `Oscillat
 snake-game/
 ├── index.html      # The whole game (markup + styles + logic in one file)
 ├── docs/
-│   └── preview.png # Screenshot used in this README
+│   ├── preview.png            # Classic screenshot used in this README
+│   └── preview-minigames.png  # Mini-game branch screenshot
 ├── .gitignore      # Ignores OS files, editor config, local AI assistant data
 └── README.md       # The document you're reading
 ```
