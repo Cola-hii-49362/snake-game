@@ -1,0 +1,15 @@
+# macOS 系统文件
+.DS_Store
+._*
+
+# 编辑器 / IDE
+.vscode/
+.idea/
+*.swp
+
+# AI 助手本地工作目录（记忆、会话缓存等，不纳入版本管理）
+.workbuddy-ai/
+
+# 日志与临时文件
+*.log
+*.tmp
